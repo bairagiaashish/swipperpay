@@ -1,0 +1,13 @@
+# OS
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Editors
+.vscode/
+.idea/
+
+# Local backups exported from the app
+*.local.json
+swipperpay-backup-*.json
+swipperpay-*.csv

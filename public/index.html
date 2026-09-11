@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Track daily attendance and calculate pay for car swippers. Works offline, installs to your phone.">
+  <meta name="theme-color" content="#4f46e5" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b0f1a" media="(prefers-color-scheme: dark)">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>SwipperPay — Attendance &amp; Pay</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ============ App bar ============ -->
+  <header class="appbar">
+    <div class="appbar-inner">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">🚗</span>
+        <span class="brand-text">
+          <strong>SwipperPay</strong>
+          <small>Attendance &amp; pay tracker</small>
+        </span>
+      </div>
+      <div class="appbar-actions">
+        <button id="themeToggle" class="icon-btn" type="button" title="Toggle dark mode" aria-label="Toggle dark mode">
+          <span class="theme-icon-light" aria-hidden="true">☀</span>
+          <span class="theme-icon-dark" aria-hidden="true">☾</span>
+        </button>
+        <button id="installBtn" class="btn btn-ghost btn-sm" type="button" hidden>⬇ Install app</button>
+      </div>
+    </div>
+
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button class="tab is-active" role="tab" aria-selected="true"  data-view="today"   type="button"><span aria-hidden="true">✓</span> Today</button>
+      <button class="tab"           role="tab" aria-selected="false" data-view="workers" type="button"><span aria-hidden="true">👥</span> Workers</button>
+      <button class="tab"           role="tab" aria-selected="false" data-view="reports" type="button"><span aria-hidden="true">📊</span> Reports</button>
+    </nav>
+  </header>
+
+  <main class="content">
+
+    <!-- ============ TODAY ============ -->
+    <section class="view is-active" id="view-today" role="tabpanel" aria-label="Today's attendance">
+
+      <div class="date-bar card">
+        <button class="icon-btn" id="prevDay" type="button" aria-label="Previous day">‹</button>
+        <div class="date-bar-label">
+          <strong id="selectedDate">Today</strong>
+          <input type="date" id="attendanceDate" aria-label="Select date">
+        </div>
+        <button class="icon-btn" id="nextDay" type="button" aria-label="Next day">›</button>
+      </div>
+
+      <div class="stat-row" id="todayStats"></div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>Daily attendance</h2>
+          <div class="bulk-actions">
+            <button class="btn btn-soft btn-sm" id="markAllPresent" type="button">Mark all present</button>
+            <button class="btn btn-soft btn-sm" id="markAllHoliday" type="button">All holiday</button>
+          </div>
+        </div>
+        <div id="attendanceList" class="attendance-list"></div>
+      </div>
+
+    </section>
+
+    <!-- ============ WORKERS ============ -->
+    <section class="view" id="view-workers" role="tabpanel" aria-label="Manage workers" hidden>
+
+      <div class="card">
+        <div class="card-head"><h2>Add a swipper</h2></div>
+        <div class="add-form">
+          <div class="field">
+            <label for="swipperName">Name</label>
+            <input type="text" id="swipperName" placeholder="e.g. Ramesh Kumar" autocomplete="off">
+          </div>
+          <div class="field field-narrow">
+            <label for="swipperRate">Daily rate (₹)</label>
+            <input type="number" id="swipperRate" value="24" min="0" step="1" inputmode="numeric">
+          </div>
+          <button id="addSwipperBtn" class="btn btn-primary" type="button">Add swipper</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>Swippers <span class="count-pill" id="workerCount">0</span></h2>
+        </div>
+        <div id="swipperList" class="worker-list"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Data</h2></div>
+        <p class="muted small">Everything is stored privately on this device. Export a backup before clearing your browser data or switching phones.</p>
+        <div class="data-actions">
+          <button id="exportJsonBtn" class="btn btn-soft" type="button">📤 Export backup (JSON)</button>
+          <button id="exportCsvBtn"  class="btn btn-soft" type="button">📄 Export sheet (CSV)</button>
+          <label class="btn btn-soft" for="importFile">📥 Restore backup</label>
+          <input type="file" id="importFile" accept="application/json,.json" hidden>
+          <button id="clearDataBtn" class="btn btn-danger" type="button">🗑 Clear all data</button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============ REPORTS ============ -->
+    <section class="view" id="view-reports" role="tabpanel" aria-label="Monthly reports" hidden>
+
+      <div class="card">
+        <div class="card-head"><h2>Monthly summary</h2></div>
+        <div class="summary-controls">
+          <div class="field">
+            <label for="summaryMonth">Month</label>
+            <input type="month" id="summaryMonth">
+          </div>
+          <div class="field">
+            <label for="swipperSelect">Swipper</label>
+            <select id="swipperSelect"></select>
+          </div>
+        </div>
+      </div>
+
+      <div id="summaryContent"></div>
+
+    </section>
+
+  </main>
+
+  <footer class="foot">
+    <span>Works offline · Data stays on this device</span>
+  </footer>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<!-- ============ Confirm dialog ============ -->
+<div class="modal" id="confirmModal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <h3 id="confirmTitle">Are you sure?</h3>
+    <p id="confirmBody" class="muted"></p>
+    <div class="modal-actions">
+      <button class="btn btn-soft" id="confirmCancel" type="button">Cancel</button>
+      <button class="btn btn-danger" id="confirmOk" type="button">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
